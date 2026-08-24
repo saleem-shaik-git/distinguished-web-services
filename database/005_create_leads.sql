@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS leads (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(180) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(80) NULL,
+  company VARCHAR(180) NULL,
+  service VARCHAR(180) NULL,
+  budget VARCHAR(100) NULL,
+  timeline VARCHAR(100) NULL,
+  message TEXT NOT NULL,
+  source VARCHAR(80) NOT NULL DEFAULT 'website',
+  status ENUM('new','contacted','proposal','won','lost') NOT NULL DEFAULT 'new',
+  priority ENUM('low','normal','high') NOT NULL DEFAULT 'normal',
+  notes TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_leads_status (status),
+  KEY idx_leads_priority (priority),
+  KEY idx_leads_created (created_at),
+  KEY idx_leads_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
