@@ -1,0 +1,6 @@
+<?php
+declare(strict_types=1);
+$paystackSecret=(string)(getenv('PAYSTACK_SECRET_KEY')?:($_ENV['PAYSTACK_SECRET_KEY']??''));
+$paystackPublic=(string)(getenv('PAYSTACK_PUBLIC_KEY')?:($_ENV['PAYSTACK_PUBLIC_KEY']??''));
+function paystack_request(string $method,string $path,?array $payload=null):array{global $paystackSecret;if($paystackSecret==='')return ['ok'=>false,'error'=>'PAYSTACK_SECRET_KEY is not configured'];$ch=curl_init('https://api.paystack.co'.'/'.$path);$headers=['Authorization: Bearer '.$paystackSecret,'Content-Type: application/json','Cache-Control: no-cache'];curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_TIMEOUT=>30]);if($payload!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($payload));$raw=curl_exec($ch);$err=curl_error($ch);$code=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);if($raw===false)return ['ok'=>false,'error'=>$err];$data=json_decode($raw,true);return ['ok'=>$code>=200&&$code<300&&($data['status']??false)===true,'status'=>$code,'data'=>$data,'error'=>$data['message']??null];}
+function paystack_signature_valid(string $raw,string $signature):bool{global $paystackSecret;return $paystackSecret!==''&&hash_equals(hash_hmac('sha512',$raw,$paystackSecret),$signature);}
