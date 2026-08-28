@@ -1,6 +1,6 @@
 # Distinguished Web Services
 
-Premium PHP/MySQL/Bootstrap portfolio and digital agency website for Distinguished Web Services.
+Premium PHP/MySQL/Bootstrap portfolio and digital agency website for Distinguished Web Services — plus an internal **Operations Suite (14.6–14.10)**: cost ledger & profitability, predictive risk alerts, automated reports, automation engine and executive BI dashboards. See **[OPS.md](OPS.md)**.
 
 ## Phase 1 — Foundation
 
@@ -17,9 +17,10 @@ Premium PHP/MySQL/Bootstrap portfolio and digital agency website for Distinguish
 ## Local setup
 
 1. Place the repository under `C:\xampp\htdocs\distinguished-web-services`.
-2. Create the database by importing `database/schema.sql` in phpMyAdmin.
+2. Create the database by importing `database/schema.sql` in phpMyAdmin (marketing site tables).
 3. Review `config/config.php` and update `APP_URL` and database credentials if needed.
 4. Open `http://localhost/distinguished-web-services/`.
+5. For the ops console: open `admin/install.php`, run install, then sign in at `admin/index.php` (credentials in [OPS.md](OPS.md)).
 
 ## Planned phases
 

@@ -1,0 +1,8 @@
+# Ops suite runtime data (SQLite demo/test databases)
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+
+# OS junk
+.DS_Store
+Thumbs.db

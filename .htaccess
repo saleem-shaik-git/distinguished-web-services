@@ -12,3 +12,11 @@ Options -Indexes
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# Ops suite hardening: never serve source/data files over HTTP
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(sql|md|sqlite|log|lock)$">
+        Require all denied
+    </FilesMatch>
+    RedirectMatch 404 ^/(\.git|src|tests|database|data)/
+</IfModule>

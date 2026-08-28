@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/config/config.php';
 
 $services = [
     ['icon' => 'bi-window-stack', 'number' => '01', 'title' => 'Web Development', 'text' => 'Professional, responsive websites designed around your brand, audience and business objectives.'],
