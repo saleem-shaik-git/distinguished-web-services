@@ -17,7 +17,17 @@ date_default_timezone_set('Africa/Lagos');
 
 function ops_db(): PDO
 {
-    return Db::pdo();
+    try {
+        return Db::pdo();
+    } catch (Throwable $e) {
+        // Convert an opaque 500 into a self-explanatory page.
+        http_response_code(500);
+        $msg = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+        exit('Ops database unavailable (driver: ' . OPS_DB_DRIVER . '): ' . $msg . '<br><br>'
+            . 'Fix the credentials in <code>config/config.php</code> (cPanel &rarr; MySQL Databases), '
+            . 'or run <a href="install.php">admin/install.php</a>. If you uploaded a local '
+            . '<code>data/ops.sqlite</code>, delete it from the server first.');
+    }
 }
 
 /** HTML-escape helper. */

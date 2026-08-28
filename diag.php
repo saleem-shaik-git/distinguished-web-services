@@ -59,15 +59,41 @@ if (is_dir($dataDir)) {
     echo is_writable(__DIR__) ? "absent but can be auto-created\n" : "absent and parent NOT writable\n";
 }
 
+// 6) LIVE TEST — render the homepage in-process (catches the real 500 cause)
+echo "\n[6] Homepage render test\n";
+$_SERVER['REQUEST_METHOD'] = 'GET';
+ob_start();
+try {
+    require __DIR__ . '/index.php';
+    $html = ob_get_clean();
+    printf("   rendered %d bytes — OK (hero present: %s)\n", strlen($html), strpos($html, 'Digital Solutions') !== false ? 'yes' : 'NO');
+} catch (Throwable $e) {
+    ob_get_clean();
+    printf("   FAILED: %s: %s\n   in %s:%d\n", get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+    echo "   ^ THIS is the error behind the 500 on the homepage.\n";
+}
+
+// 7) LIVE TEST — ops database connection (what /admin needs)
+echo "\n[7] Ops database connection\n";
+try {
+    require_once __DIR__ . '/src/Db.php';
+    $pdo = Db::pdo();
+    $ver = (string) $pdo->query($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'SELECT sqlite_version()' : 'SELECT VERSION()')->fetchColumn();
+    echo "   driver: " . OPS_DB_DRIVER . " — connected (server version $ver)\n";
+} catch (Throwable $e) {
+    printf("   driver: %s — FAILED: %s: %s\n", defined('OPS_DB_DRIVER') ? OPS_DB_DRIVER : 'n/a', get_class($e), $e->getMessage());
+    echo "   => MySQL: create the DB + user in cPanel 'MySQL Databases', put them in\n";
+    echo "      config/config.php (DB_HOST stays 'localhost' on cPanel), then run admin/install.php.\n";
+    echo "   => If you uploaded data/ops.sqlite from your own computer: DELETE it from the\n";
+    echo "      server (stale demo data / read-only after upload breaks the admin pages).\n";
+}
+
 echo "\nHow to read your 500\n--------------------\n";
-echo "1. EVERYTHING 500s (even this diag.php and /assets/css/style.css)\n";
-echo "   => .htaccess problem. Rename .htaccess to .htaccess.bak and reload.\n";
-echo "      If it works: use the updated .htaccess from the repo (mod_alias guard).\n";
-echo "2. Only / 500s\n";
-echo "   => index.php path bug or truncated upload — see 'require path' check above.\n";
-echo "3. Homepage fine, only /admin/... 500s\n";
-echo "   => PHP below 8.0 or a missing PDO driver — see version/extension checks.\n";
-echo "4. Exact reason: cPanel -> Metrics -> Errors. Look for 'PHP Fatal error' or\n";
-echo "   'Invalid command' (Invalid command = .htaccess directive).\n";
+echo "1. [6] FAILED => the printed error IS the homepage 500 fix it / paste it back.\n";
+echo "2. [7] FAILED => admin pages will 500 — fix the database as described above.\n";
+echo "3. Both OK but a specific page still 500s => cPanel -> Metrics -> Errors,\n";
+echo "   look for the last 'PHP Fatal error' line for that URL.\n";
+echo "4. diag.php itself 500s (you can't see this page) => .htaccess problem:\n";
+echo "   rename .htaccess to .htaccess.bak and reload.\n";
 echo "\nSAPI: " . PHP_SAPI . " | display_errors: " . (string) ini_get('display_errors') . "\n";
 echo "Delete diag.php when finished.\n";
