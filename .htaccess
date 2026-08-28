@@ -13,10 +13,14 @@ Options -Indexes
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Ops suite hardening: never serve source/data files over HTTP
+# Ops suite hardening: never serve source/data files over HTTP.
+# NOTE: if the app lives in a subdirectory (e.g. public_html/site/), anchor
+# the regex accordingly: ^/site/(\.git|src|tests|database|data)/
 <IfModule mod_authz_core.c>
     <FilesMatch "\.(sql|md|sqlite|log|lock)$">
         Require all denied
     </FilesMatch>
+</IfModule>
+<IfModule mod_alias.c>
     RedirectMatch 404 ^/(\.git|src|tests|database|data)/
 </IfModule>
